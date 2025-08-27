@@ -1,4 +1,4 @@
-import google.generativeai as genai
+import google.generativeai as genai # type: ignore
 import random
 import time
 from datetime import datetime
@@ -61,30 +61,87 @@ model = genai.GenerativeModel(
     system_instruction=SYSTEM_PROMPT
 )
 
-# Start a chat session
+# Start a chat session (persisted across requests)
 chat = model.start_chat()
 
-print("💬 Chat with Bubble! (type 'bye' to exit)\n")
-
-# Bubble's initial greeting
+# Initial greetings list
 initial_greetings = [
     "Hey there! 👋 How's your digital world treating you today?",
     "Hi! I'm here if you want to chat about your social media vibe. 🫧",
     "Hello! Just popping in to see how you're doing with your online time today."
 ]
 
-print("Bubble:", random.choice(initial_greetings))
+def get_bubble_response(message: str) -> str:
+    """Send a message to Bubble and return the AI's reply."""
+    if not message.strip():
+        return ""
+    # Provide an initial greeting for specific prompts
+    if message.strip().lower() in {"hi", "hello", "start", "init"}:
+        return random.choice(initial_greetings)
+    response = chat.send_message(message)
+    return response.text.strip()
 
-while True:
-    user_input = input("\nYou: ")
-    
-    if user_input.lower() in ["bye"]:
-        print("Bubble: Bye for now! I'm always here if you need to chat later. 👋")
-        break
-        
-    if user_input.strip() == "":
-        continue
-        
-    # Send user message and get response
-    response = chat.send_message(user_input)
-    print("Bubble:", response.text.strip())
+
+if __name__ == "__main__":
+    import sys
+    import argparse
+    if len(sys.argv) == 1:
+        # ---------- CLI chat mode ----------
+        print("💬 Chat with Bubble! (type 'bye' to exit)\n")
+        print("Bubble:", random.choice(initial_greetings))
+        while True:
+            user_input = input("\nYou: ")
+            if user_input.lower() == "bye":
+                print("Bubble: Bye for now! I'm always here if you need to chat later. 👋")
+                break
+            if user_input.strip() == "":
+                continue
+            print("Bubble:", get_bubble_response(user_input))
+    elif sys.argv[1] == "serve":
+        # ---------- HTTP API mode ----------
+        from flask import Flask, request, jsonify
+        try:
+            from flask_cors import CORS, cross_origin  # type: ignore
+        except ImportError:
+            CORS = None
+            cross_origin = None
+
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--port", type=int, default=5050)
+        parser.add_argument("--host", default="0.0.0.0")
+        args, _ = parser.parse_known_args(sys.argv[2:])
+
+        app = Flask(__name__)
+
+        # CORS: allow typical dev origins AND file:// (Origin: null)
+        if CORS:
+            CORS(
+                app,
+                resources={r"/*": {"origins": ["*", "null"]}},
+                supports_credentials=False,
+                allow_headers=["Content-Type"],
+                methods=["GET", "POST", "OPTIONS"],
+            )
+
+        @app.route("/health", methods=["GET"])
+        def health():
+            return jsonify({"ok": True})
+
+        @app.route("/chat", methods=["POST", "OPTIONS"])
+        def chat_endpoint():
+            if request.method == "OPTIONS":
+                # Preflight handled; headers added by Flask-CORS if present
+                return ("", 200)
+            data = request.get_json(silent=True) or {}
+            message = data.get("message", "")
+            reply = get_bubble_response(message)
+            return jsonify({"response": reply})
+
+        @app.route("/init", methods=["GET", "OPTIONS"])
+        def init_endpoint():
+            if request.method == "OPTIONS":
+                return ("", 200)
+            return jsonify({"response": random.choice(initial_greetings)})
+
+        print(f"* Serving Bubble API on http://{args.host}:{args.port}")
+        app.run(host=args.host, port=args.port)
