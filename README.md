@@ -57,6 +57,15 @@ Data Flow:
   AI Bobo → supports the journey with empathetic chat, explanations, and gentle nudges.
   Gamification → task system + BubbleCoins unlock avatar customization.
 
+Minimal API (proposal-level)
+  POST /oauth/callback → store user token (encrypted)
+  GET /feeds?since=... → fetch session posts (per platform)
+  POST /nlp/analyze → returns metrics per post + aggregates (for pie chart)
+  GET /simulation/last30 → last window posts (features only)
+  POST /simulation/rerank → {weights} → ranked list
+  POST /chat → {message} → Gemini reply (with safety filter)
+  GET /report/export → PNG/PDF summary
+
 🌱 Sustainability, Scalability, Feasibility
   Sustainability: Freemium model (skins/customization) + NGO/educational licenses. Aligns with UNESCO SDGs on digital literacy & youth mental health.
   Scalability: Start with web demo → expand to Android app → integrate with classrooms/NGOs globally.
