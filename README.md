@@ -1,100 +1,42 @@
-YouthHackathon2025
+This project was developed for the **UNESCO Youth Hackathon (Media & Information Literacy track).**
 
-🌐 Bubbly — Youth Media & Information Literacy + Mental Health Companion
+Our purpose is to help young users see their algorithm bubble:
+  Track what kind of content they are exposed to
+  Classify topics and visualize their “information diet”
+  Let them interactively re-rank feeds to understand algorithm weightage
+  Provide gentle emotional support and gamification to make the experience engaging
 
-Bubbly pipeline: Data Collection → Modelling → Gemini AI → Visualization
+**Prototype Components**
 
-🚀 Problem Statement
-Young people today are trapped in a paradox: their digital worlds, designed for connection, are increasingly causing isolation, anxiety, and informational malnutrition. Algorithmic filter bubbles on social media platforms create echo chambers, while doomscrolling fuels anxiety.
-Most current “solutions” focus on screen-time punishment or dry lessons, which treat the symptoms with shame, not the cause with compassion.
+- Frontend (HTML/JS, mock mobile screens)
+  main.html → Start Journey Hub
+    User consent, start session, task list, avatar customization
+  chat.html → AI Bobo Companion
+    Gemini-powered chat for empathy & explanations (not core, only supportive)
+  piechart.html → Topic Pie Chart Visualization
+    Shows proportions of content categories (education, tech, entertainment, etc.)
+  sim.html → Interactive Simulation
+    Re-rank last 30 minutes of posts with adjustable weights (topic, novelty, friend)
 
-🎯 Objective
-Bubbly is a mobile-first prototype that redefines media literacy:
-Empower youth with clear, visual feedback on their “digital diet.”
-Support mental well-being through an empathetic, non-judgmental AI companion.
-Nudge users into curiosity-driven exploration instead of passive doomscrolling.
-Build resilience against misinformation and echo chambers with playful, engaging tools.
+- Backend / Processing (Python)
+  tracker.py → Tracking Module
+    Fetches posts from social media APIs (OAuth) or fallback demo JSON
+    Stores a rolling 30-minute buffer of session posts
+  nlp_topic.py → Topic Analysis Module
+    Runs NLP classification → assigns each post a topic (education, tech, news, etc.)
+    Calculates features for simulation (novelty, friend, optional sentiment)
+    Exports clean JSON file for frontend visualization & simulation
+  bubblechat.py → Flask API + Gemini
+    /init → greeting seed
+    /chat → send user message → Gemini 1.5 Flash with custom prompt
+    /health → prompt check
+    Bobo explains metrics, responds empathetically, and handles crisis keywords with safe fixed responses
 
-
-🧩 Prototype Features
-1. BubblePal (AI Companion)
-Empathetic chatbot (Gemini API via Flask)
-Validates emotions first, then gently suggests mindful steps
-Unlockable skins & accessories with BubbleCoins
-
-2. BubbleTrack (Analytics Dashboard)
-Visual “digital diet” (pie chart) of user’s browsing session
-Shows balance of Negative / Diversity / Novelty / Friend metrics
-Generates Session Report (PNG/PDF) with suggestions
-
-3. Simulation Mode
-Interactive sliders to simulate algorithm weights
-Watch feed reorder instantly (education through play)
-
-4. Rewards System
-Daily/weekly tasks → BubbleCoins
-Redeem for cosmetics (hats, glasses, skins, pixel town buildings)
-
-🛠️ Technical Architecture
-Frontend (HTML/JS, mock mobile screens):
-  main.html → Start Journey hub, tasks, avatar customization
-  chat.html → AI Bobo companion (supportive chat)
-  piechart.html → Visualization of “digital diet” (sentiment, diversity, novelty, friend)
-  sim.html → Interactive simulation of last 30 minutes’ posts with adjustable weights
-  
-Backend (Flask + Gemini):
-  bubblechat.py → Flask API for AI Bobo
-  
-Endpoints:
-  /init → greeting seed
-  /chat → send message → Gemini 1.5 Flash (with custom system prompt)
-  /health → service check
-Data Flow:
-  Start Journey → frontend triggers backend tracking of posts (via social media APIs / mock data for demo).
-  NLP Processing (backend) → sentiment, bias, diversity, novelty metrics calculated.
-  Visualization → PieChart dashboard shows aggregated “information diet.”
-  Simulation → last 30 minutes of posts re-ranked by user’s chosen weights (negative/diversity/novelty/friend).
-  AI Bobo → supports the journey with empathetic chat, explanations, and gentle nudges.
-  Gamification → task system + BubbleCoins unlock avatar customization.
-
-Minimal API (proposal-level)
-  POST /oauth/callback → store user token (encrypted)
-  GET /feeds?since=... → fetch session posts (per platform)
-  POST /nlp/analyze → returns metrics per post + aggregates (for pie chart)
-  GET /simulation/last30 → last window posts (features only)
-  POST /simulation/rerank → {weights} → ranked list
-  POST /chat → {message} → Gemini reply (with safety filter)
-  GET /report/export → PNG/PDF summary
-
-🌱 Sustainability, Scalability, Feasibility
-  Sustainability: Freemium model (skins/customization) + NGO/educational licenses. Aligns with UNESCO SDGs on digital literacy & youth mental health.
-  Scalability: Start with web demo → expand to Android app → integrate with classrooms/NGOs globally.
-  Feasibility: Hackathon MVP uses HTML/JS mockups + Flask/Gemini backend. Extendable to native mobile with on-device NLP.
-
-🎥 Demo & Deliverables
-  3-min pitch video (YouTube link / file)
-  Prototype (HTML pages + Flask backend)
-
-Proposal PDF (this README)
-📂 Repository Structure
-
-├── bubblechat.py        # Flask backend for chat
-
-├── main.html            # Home page (avatar, tasks)
-
-├── chat.html            # Chat UI
-
-├── piechart.html        # Analytics dashboard
-
-├── sim.html             # Simulation sliders
-
-📌 How to Run (Demo Mode)
-  -Install dependencies
-  -pip install flask flask-cors google-generativeai
-  -Add your Gemini API key in bubblechat.py.
-  -Run the backend
-  -python bubblechat.py serve --port 5050
-  -Open main.html in your browser (mock mobile screen).
-  -Chat with BubblePal, view Analytics, and play with Simulation.
-  
-✨ Bubbly isn’t about punishing screen time — it’s about turning algorithm awareness into a playful, caring daily habit.
+**Data Flow**
+  1. Start Journey → User consents, session begins in main.html
+  2. Track Social Media → tracker.py fetches recent posts, stores 30-min buffer
+  3. NLP Topic Analysis → nlp_topic.py classifies topics & generates features
+  4. Visualization → piechart.html renders information diet as topic pie chart
+  5. Simulation → sim.html loads last-30-min posts, applies weight sliders to re-rank feed
+  6. AI Bobo Companion → chat.html explains metrics & gives empathetic support
+  7. Gamification → tasks → coins → Bobo customization
