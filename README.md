@@ -37,19 +37,25 @@ Redeem for cosmetics (hats, glasses, skins, pixel town buildings)
 
 🛠️ Technical Architecture
 Frontend (HTML/JS, mock mobile screens):
-  -main.html → Main hub, tasks, avatar
-  -chat.html → AI chat with BubblePal
-  -piechart.html → Analytics visualization
-  -sim.html → Algorithm sliders
+  main.html → Start Journey hub, tasks, avatar customization
+  chat.html → AI Bobo companion (supportive chat)
+  piechart.html → Visualization of “digital diet” (sentiment, diversity, novelty, friend)
+  sim.html → Interactive simulation of last 30 minutes’ posts with adjustable weights
+  
 Backend (Flask + Gemini):
-  -bubblechat.py → Flask API for chat
-Endpoints: /init, /chat, /health
-
+  bubblechat.py → Flask API for AI Bobo
+  
+Endpoints:
+  /init → greeting seed
+  /chat → send message → Gemini 1.5 Flash (with custom system prompt)
+  /health → service check
 Data Flow:
-User interacts in HTML frontend
-Chat requests → Flask → Gemini AI → empathetic replies
-Analytics & simulation → processed client-side with mock data
-Reports generated locally (export PNG/PDF)
+  Start Journey → frontend triggers backend tracking of posts (via social media APIs / mock data for demo).
+  NLP Processing (backend) → sentiment, bias, diversity, novelty metrics calculated.
+  Visualization → PieChart dashboard shows aggregated “information diet.”
+  Simulation → last 30 minutes of posts re-ranked by user’s chosen weights (negative/diversity/novelty/friend).
+  AI Bobo → supports the journey with empathetic chat, explanations, and gentle nudges.
+  Gamification → task system + BubbleCoins unlock avatar customization.
 
 🌱 Sustainability, Scalability, Feasibility
   Sustainability: Freemium model (skins/customization) + NGO/educational licenses. Aligns with UNESCO SDGs on digital literacy & youth mental health.
@@ -62,12 +68,16 @@ Reports generated locally (export PNG/PDF)
 
 Proposal PDF (this README)
 📂 Repository Structure
+
 ├── bubblechat.py        # Flask backend for chat
+
 ├── main.html            # Home page (avatar, tasks)
+
 ├── chat.html            # Chat UI
+
 ├── piechart.html        # Analytics dashboard
+
 ├── sim.html             # Simulation sliders
-└── README.md
 
 📌 How to Run (Demo Mode)
   -Install dependencies
